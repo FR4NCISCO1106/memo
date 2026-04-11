@@ -1,25 +1,29 @@
 <?php
-session_start();
 include("includes/db.php");
+session_start(); // Paso 1: Iniciar el motor de sesiones
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if (isset($_POST['usuario']) && isset($_POST['password'])) {
     $usuario = mysqli_real_escape_string($conexion, $_POST['usuario']);
     $password = mysqli_real_escape_string($conexion, $_POST['password']);
 
-    // Buscamos al departamento por su nombre de usuario
-    $sql = "SELECT * FROM departamentos WHERE usuario = '$usuario' AND password = '$password'";
-    $resultado = mysqli_query($conexion, $sql);
+    // Consulta para buscar al departamento por su nombre de usuario y contraseña
+    $query = "SELECT id_depto, nombre_depto FROM departamentos WHERE usuario = '$usuario' AND password = '$password'";
+    $resultado = mysqli_query($conexion, $query);
 
-    if (mysqli_num_rows($resultado) > 0) {
-        $datos = mysqli_fetch_array($resultado);
+    if (mysqli_num_rows($resultado) == 1) {
+        $datos = mysqli_fetch_assoc($resultado);
         
-        // Guardamos los datos en la SESIÓN para usarlos en todo el sistema
+        // Paso 2: Guardar los datos críticos en la sesión para que index.php los reconozca
         $_SESSION['id_depto'] = $datos['id_depto'];
         $_SESSION['nombre_depto'] = $datos['nombre_depto'];
 
-        header("Location: index.php"); // Redirige al Dashboard
+        // Paso 3: Redirigir al panel principal
+        header("Location: index.php");
+        exit();
     } else {
-        header("Location: login.php?error=1"); // Error de datos incorrectos
+        // Si los datos son incorrectos, volver al login con un error
+        header("Location: login.php?error=1");
+        exit();
     }
 }
 ?>

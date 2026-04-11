@@ -1,6 +1,6 @@
 <?php
-session_start();
 include("includes/db.php");
+include("includes/verificar_sesion.php");
 
 // 1. Verificación de Seguridad: Si no hay sesión, mandarlo al login
 if (!isset($_SESSION['id_depto'])) {
@@ -8,11 +8,18 @@ if (!isset($_SESSION['id_depto'])) {
     exit();
 }
 
-// DEFINICIÓN DE VARIABLES CRÍTICAS
+// DEFINICIÓN DE VARIABLES CRÍTICAS (Se definen arriba para que las consultas SQL funcionen)
 $id_actual = $_SESSION['id_depto'];
 $nombre_depto_actual = $_SESSION['nombre_depto'];
 
-// 2. Consultas para los contadores de las tarjetas (Cards) usando $id_actual
+// 2. Datos para el gráfico de pastel (Estatus de solicitudes enviadas por mi departamento)
+$res_proc = mysqli_query($conexion, "SELECT COUNT(*) as total FROM solicitudes WHERE id_remitente = $id_actual AND estatus = 1");
+$enviados_procesados = mysqli_fetch_assoc($res_proc)['total'];
+
+$res_pend = mysqli_query($conexion, "SELECT COUNT(*) as total FROM solicitudes WHERE id_remitente = $id_actual AND estatus = 0");
+$enviados_pendientes = mysqli_fetch_assoc($res_pend)['total'];
+
+// 3. Consultas para los contadores de las tarjetas (Cards)
 $res_recibidos = mysqli_query($conexion, "SELECT COUNT(*) as total FROM solicitudes WHERE id_destinatario = $id_actual");
 $total_recibidos = mysqli_fetch_assoc($res_recibidos)['total'];
 
@@ -51,7 +58,7 @@ $total_enviados = mysqli_fetch_assoc($res_enviados)['total'];
 
                         <div class="row">
                             <div class="col-xl-4 col-md-6">
-                                <div class="card bg-primary text-white mb-4">
+                                <div class="card bg-primary text-white mb-4 shadow">
                                     <div class="card-body">Recibidos: <strong><?php echo $total_recibidos; ?></strong></div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
                                         <a class="small text-white stretched-link" href="recibidos.php">Ver bandeja</a>
@@ -60,7 +67,7 @@ $total_enviados = mysqli_fetch_assoc($res_enviados)['total'];
                                 </div>
                             </div>
                             <div class="col-xl-4 col-md-6">
-                                <div class="card bg-danger text-white mb-4">
+                                <div class="card bg-danger text-white mb-4 shadow">
                                     <div class="card-body">Pendientes: <strong><?php echo $total_pendientes; ?></strong></div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
                                         <a class="small text-white stretched-link" href="pendientes.php">Ver por procesar</a>
@@ -69,7 +76,7 @@ $total_enviados = mysqli_fetch_assoc($res_enviados)['total'];
                                 </div>
                             </div>
                             <div class="col-xl-4 col-md-6">
-                                <div class="card bg-success text-white mb-4">
+                                <div class="card bg-success text-white mb-4 shadow">
                                     <div class="card-body">Enviados: <strong><?php echo $total_enviados; ?></strong></div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
                                         <a class="small text-white stretched-link" href="enviados.php">Ver historial</a>
@@ -81,35 +88,16 @@ $total_enviados = mysqli_fetch_assoc($res_enviados)['total'];
 
                         <div class="row">
                             <div class="col-lg-5">
-                                <div class="card mb-4 border-left-primary shadow">
+                                <div class="card mb-4 shadow">
                                     <div class="card-header bg-light">
-                                        <i class="fas fa-paper-plane me-1"></i> Enviar Solicitud
+                                        <i class="fas fa-chart-pie me-1"></i> Resumen de Mis Solicitudes
                                     </div>
                                     <div class="card-body">
-                                        <form action="procesar_envio.php" method="POST">
-                                            <div class="mb-3">
-                                                <label class="form-label font-weight-bold">Destinatario</label>
-                                                <select name="id_destinatario" class="form-select" required>
-                                                    <option value="">Seleccione departamento...</option>
-                                                    <?php
-                                                    $q_deptos = mysqli_query($conexion, "SELECT * FROM departamentos WHERE id_depto != $id_actual");
-                                                    while($d = mysqli_fetch_assoc($q_deptos)){
-                                                        echo "<option value='".$d['id_depto']."'>".$d['nombre_depto']."</option>";
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label font-weight-bold">Asunto</label>
-                                                <input type="text" name="asunto" class="form-control" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label font-weight-bold">Mensaje</label>
-                                                <textarea name="mensaje" class="form-control" rows="3" required></textarea>
-                                            </div>
-                                            <button type="submit" class="btn btn-primary w-100">Enviar Ahora</button>
-                                        </form>
+                                        <div style="height: 300px;">
+                                            <canvas id="myPieChart"></canvas>
+                                        </div>
                                     </div>
+                                    <div class="card-footer small text-muted">Datos de envíos actuales</div>
                                 </div>
                             </div>
 
@@ -153,6 +141,30 @@ $total_enviados = mysqli_fetch_assoc($res_enviados)['total'];
                 </footer>
             </div>
         </div>
+
         <?php include("includes/script.php");?>
+        
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+        var ctx = document.getElementById("myPieChart");
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ["Procesadas", "Pendientes"],
+                datasets: [{
+                    data: [<?php echo $enviados_procesados; ?>, <?php echo $enviados_pendientes; ?>],
+                    backgroundColor: ['#198754', '#ffc107'], // Verde (Success) y Amarillo (Warning)
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        </script>
     </body>
 </html>

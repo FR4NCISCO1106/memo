@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-      <?php include("includes/header.php");?>
+    <?php include("includes/header.php");
+    include("includes/verificar_sesion.php");
+    ?>
+    
+    
     </head>
     <body class="bg-primary">
         <div id="layoutAuthentication">

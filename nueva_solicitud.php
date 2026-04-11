@@ -1,12 +1,9 @@
 <?php 
-session_start();
+// 1. IMPORTANTE: Usamos el verificador que creamos para asegurar la sesión
+include("includes/verificar_sesion.php"); 
 include("includes/db.php");
 
-if (!isset($_SESSION['id_depto'])) {
-    header("Location: login.php");
-    exit();
-}
-
+// Ya no necesitas el if(!isset($_SESSION...)) aquí porque el include de arriba lo hace por ti
 $id_actual = $_SESSION['id_depto'];
 
 // Obtener departamentos excepto el actual
@@ -83,7 +80,7 @@ $res_deptos = mysqli_query($conexion, $sql_deptos);
                                             <input type="file" class="form-control" id="archivo" name="archivo" accept=".pdf">
                                             <small class="text-muted">Solo archivos PDF (máx. 10MB)</small>
                                         </div>
-                                                  
+                                                
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                             <button type="submit" class="btn btn-primary">
                                                 <i class="fas fa-paper-plane"></i> Enviar Solicitud

@@ -1,6 +1,6 @@
 <?php
-session_start();
 include("includes/db.php");
+include("includes/verificar_sesion.php");
 
 if (!isset($_SESSION['id_depto'])) {
     header("Location: login.php");

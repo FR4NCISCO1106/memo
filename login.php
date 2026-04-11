@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <?php include("includes/header.php");?>
+    
 </head>
 <body class="bg-primary">
     <div id="layoutAuthentication">
