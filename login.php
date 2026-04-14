@@ -4,15 +4,23 @@
     <?php include("includes/header.php");?>
     
 </head>
-<body class="bg-primary">
+<body class="text-bg-primary">
+    
     <div id="layoutAuthentication">
         <div id="layoutAuthentication_content">
             <main>
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-5">
-                            <div class="card shadow-lg border-0 rounded-lg mt-5">
-                                <div class="card-header"><h3 class="text-center font-weight-light my-4">Acceso por Departamento</h3></div>
+                <div id="layoutAuthentication">
+                    <div id="layoutAuthentication_content">
+                        <main>
+                            <div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+                                <div class="row justify-content-center w-100">
+                                    <div class="col-lg-5">
+                                        <div class="card shadow-lg border-0 rounded-lg">
+                                            <div class="card-header">
+                                                <div class="text-center mt-3">
+                                                    <img src="img/bicentenario.png" alt="Logo" style="max-width: 280px;" class="img-fluid">
+                                                </div>                                            
+                            </div>
                                 <div class="card-body">
                                     <?php if(isset($_GET['error'])) echo '<div class="alert alert-danger">Usuario o contraseña incorrectos.</div>'; ?>
                                     

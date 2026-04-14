@@ -600,6 +600,7 @@ progress {
 .img-fluid {
   max-width: 100%;
   height: auto;
+  margin-top: -70px;
 }
 
 .img-thumbnail {
@@ -2862,11 +2863,11 @@ textarea.form-control-lg {
 
 .btn-primary {
   --bs-btn-color: #fff;
-  --bs-btn-bg: #0d6efd;
-  --bs-btn-border-color: #0d6efd;
+  --bs-btn-bg: #1ebc2d;
+  --bs-btn-border-color: #013a08;
   --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: #0b5ed7;
-  --bs-btn-hover-border-color: #0a58ca;
+  --bs-btn-hover-bg: #014001;
+  --bs-btn-hover-border-color: #1ebc2d;
   --bs-btn-focus-shadow-rgb: 49, 132, 253;
   --bs-btn-active-color: #fff;
   --bs-btn-active-bg: #0a58ca;
@@ -4243,6 +4244,7 @@ textarea.form-control-lg {
 .card-header {
   padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
   margin-bottom: 0;
+  top: 50%;
   color: var(--bs-card-cap-color);
   background-color: var(--bs-card-cap-bg);
   border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);
@@ -6672,8 +6674,18 @@ textarea.form-control-lg {
 }
 
 .text-bg-primary {
-  color: #fff !important;
-  background-color: RGBA(13, 110, 253, var(--bs-bg-opacity, 1)) !important;
+  color: #000 !important;
+  background-color: RGBA(1, 59, 3, var(--bs-bg-opacity, 1)) !important;
+}
+
+
+.fondo-login {
+    background-image: url('../img/fondo.jpg') !important; /* El ../ sube un nivel de carpeta */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh; /* Asegura que cubra todo el alto */
 }
 
 .text-bg-secondary {

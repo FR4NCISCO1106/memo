@@ -1,4 +1,8 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+    
+    <div class="text-center mt-4">
+                <img src="img/bicentenario.png" alt="Logo" style="max-width: 80%; opacity: 0.8;" class="img-fluid">
+            </div>
     <div class="sb-sidenav-menu">
         <div class="nav">
             <div class="sb-sidenav-menu-heading">Principal</div>
