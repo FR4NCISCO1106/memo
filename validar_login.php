@@ -1,29 +1,54 @@
 <?php
 include("includes/db.php");
-session_start(); // Paso 1: Iniciar el motor de sesiones
+session_start();
 
 if (isset($_POST['usuario']) && isset($_POST['password'])) {
-    $usuario = mysqli_real_escape_string($conexion, $_POST['usuario']);
-    $password = mysqli_real_escape_string($conexion, $_POST['password']);
+    
+    // Validar que no estén vacíos
+    if(empty($_POST['usuario']) || empty($_POST['password'])) {
+        header("Location: login.php?error=2"); // Error: campos vacíos
+        exit();
+    }
+    
+    $usuario = trim($_POST['usuario']); // Limpiar espacios en blanco
+    $password = $_POST['password'];
 
-    // Consulta para buscar al departamento por su nombre de usuario y contraseña
-    $query = "SELECT id_depto, nombre_depto FROM departamentos WHERE usuario = '$usuario' AND password = '$password'";
-    $resultado = mysqli_query($conexion, $query);
+    // Usar prepared statement para prevenir SQL injection
+    $stmt = $conexion->prepare("SELECT id_depto, nombre_depto FROM departamentos WHERE usuario = ? AND password = ?");
+    $stmt->bind_param("ss", $usuario, $password);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
 
-    if (mysqli_num_rows($resultado) == 1) {
-        $datos = mysqli_fetch_assoc($resultado);
+    if ($resultado->num_rows == 1) {
+        $datos = $resultado->fetch_assoc();
         
-        // Paso 2: Guardar los datos críticos en la sesión para que index.php los reconozca
         $_SESSION['id_depto'] = $datos['id_depto'];
         $_SESSION['nombre_depto'] = $datos['nombre_depto'];
 
-        // Paso 3: Redirigir al panel principal
         header("Location: index.php");
         exit();
     } else {
-        // Si los datos son incorrectos, volver al login con un error
-        header("Location: login.php?error=1");
+        // Verificar si el usuario existe para dar mensaje más específico (opcional)
+        $stmt2 = $conexion->prepare("SELECT id_depto FROM departamentos WHERE usuario = ?");
+        $stmt2->bind_param("s", $usuario);
+        $stmt2->execute();
+        $resultado2 = $stmt2->get_result();
+        
+        if($resultado2->num_rows == 0) {
+            // El usuario no existe
+            header("Location: login.php?error=3");
+        } else {
+            // Usuario existe pero contraseña incorrecta
+            header("Location: login.php?error=4");
+        }
+        $stmt2->close();
         exit();
     }
+    
+    $stmt->close();
+} else {
+    // Si intentan entrar a validar_login.php sin enviar datos
+    header("Location: login.php");
+    exit();
 }
 ?>
